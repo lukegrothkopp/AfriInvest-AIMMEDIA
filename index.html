@@ -1,266 +1,107 @@
+
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AIMMEDIA × AFRI-INVEST Tracker</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  :root {
-    --bg: #f7f7f5;
-    --surface: #ffffff;
-    --surface2: #f2f2ef;
-    --border: rgba(0,0,0,0.1);
-    --border-strong: rgba(0,0,0,0.18);
-    --text: #1a1a18;
-    --text2: #6b6b67;
-    --text3: #a0a09c;
-    --green: #1a7a4a;
-    --green-bg: #e8f5ee;
-    --amber: #92580a;
-    --amber-bg: #fef3e0;
-    --red: #b03030;
-    --red-bg: #fdeaea;
-    --blue: #1a4d8a;
-    --blue-bg: #e8f0fa;
-    --radius: 8px;
-    --radius-lg: 12px;
-    --shadow: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
-  }
-
-  body {
-    font-family: 'Inter', sans-serif;
-    font-size: 14px;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-  }
-
-  /* ── Top bar ── */
-  .topbar {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 0 32px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 56px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  .topbar-brand { display: flex; align-items: center; gap: 12px; }
-  .topbar-logo {
-    width: 28px; height: 28px; border-radius: 6px;
-    background: #1a3a2a; display: flex; align-items: center; justify-content: center;
-  }
-  .topbar-logo svg { width: 16px; height: 16px; }
-  .topbar-title { font-size: 14px; font-weight: 600; letter-spacing: -0.01em; }
-  .topbar-sub { font-size: 12px; color: var(--text2); margin-left: 4px; }
-  .topbar-right { display: flex; align-items: center; gap: 10px; }
-  .sync-status { font-size: 12px; color: var(--text3); display: flex; align-items: center; gap: 5px; }
-  .sync-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text3); }
-  .sync-dot.ok { background: var(--green); }
-  .sync-dot.err { background: var(--red); }
-  .sync-dot.syncing { background: var(--amber); animation: pulse 1s infinite; }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-
-  /* ── Layout ── */
-  .page { max-width: 1100px; margin: 0 auto; padding: 28px 24px; }
-
-  /* ── Metric cards ── */
-  .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 28px; }
-  .metric {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius-lg); padding: 16px 18px;
-    box-shadow: var(--shadow);
-  }
-  .metric-label { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text2); margin-bottom: 6px; }
-  .metric-value { font-size: 26px; font-weight: 600; letter-spacing: -0.02em; }
-  .metric-value.green { color: var(--green); }
-  .metric-value.amber { color: var(--amber); }
-  .metric-value.red { color: var(--red); }
-
-  /* ── Tabs ── */
-  .tabs { display: flex; gap: 2px; background: var(--surface2); border-radius: 10px; padding: 3px; margin-bottom: 24px; width: fit-content; }
-  .tab {
-    padding: 7px 18px; font-size: 13px; font-weight: 500; border: none;
-    border-radius: 8px; background: none; color: var(--text2);
-    cursor: pointer; font-family: inherit; transition: all 0.15s;
-  }
-  .tab:hover { color: var(--text); }
-  .tab.active { background: var(--surface); color: var(--text); box-shadow: var(--shadow); }
-
-  /* ── Section cards ── */
-  .section-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius-lg); margin-bottom: 12px;
-    box-shadow: var(--shadow); overflow: hidden;
-  }
-  .section-header {
-    display: flex; align-items: center; gap: 10px;
-    padding: 13px 18px; cursor: pointer;
-    user-select: none;
-  }
-  .section-header:hover { background: var(--surface2); }
-  .section-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text2); }
-  .section-chevron { margin-left: auto; color: var(--text3); font-size: 12px; transition: transform 0.2s; }
-  .section-chevron.open { transform: rotate(180deg); }
-
-  /* ── Badge ── */
-  .badge {
-    display: inline-flex; align-items: center;
-    font-size: 11px; font-weight: 500; padding: 2px 8px;
-    border-radius: 99px; white-space: nowrap;
-  }
-  .b-done { background: var(--green-bg); color: var(--green); }
-  .b-partial { background: var(--amber-bg); color: var(--amber); }
-  .b-pending { background: var(--surface2); color: var(--text2); }
-  .b-blocked { background: var(--red-bg); color: var(--red); }
-  .b-info { background: var(--blue-bg); color: var(--blue); }
-
-  /* ── Table ── */
-  table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  th {
-    text-align: left; font-size: 11px; font-weight: 600;
-    text-transform: uppercase; letter-spacing: 0.05em;
-    color: var(--text2); padding: 9px 18px;
-    background: var(--surface2);
-    border-bottom: 1px solid var(--border);
-  }
-  td { padding: 10px 18px; border-bottom: 1px solid var(--border); vertical-align: middle; }
-  tr:last-child td { border-bottom: none; }
-  tr:hover td { background: var(--surface2); }
-
-  /* ── Progress bar ── */
-  .prog { height: 5px; background: var(--surface2); border-radius: 99px; min-width: 50px; overflow: hidden; border: 1px solid var(--border); }
-  .prog-fill { height: 100%; border-radius: 99px; background: var(--green); }
-  .prog-fill.partial { background: var(--amber); }
-
-  /* ── Form controls ── */
-  select, input[type=text] {
-    font-size: 12px; padding: 4px 8px; border-radius: var(--radius);
-    border: 1px solid var(--border-strong); background: var(--surface);
-    color: var(--text); font-family: inherit; outline: none;
-  }
-  select:focus, input[type=text]:focus { border-color: #1a4d8a; box-shadow: 0 0 0 2px rgba(26,77,138,0.12); }
-  input[type=checkbox] { width: 15px; height: 15px; cursor: pointer; accent-color: var(--green); flex-shrink: 0; }
-  input.note { width: 100%; background: transparent; border: 1px solid transparent; }
-  input.note:hover { border-color: var(--border); background: var(--surface); }
-  input.note:focus { border-color: #1a4d8a; background: var(--surface); }
-
-  /* ── Payment blocks ── */
-  .pay-block {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius-lg); padding: 18px 20px;
-    margin-bottom: 12px; box-shadow: var(--shadow);
-  }
-  .pay-top { display: flex; justify-content: space-between; align-items: flex-start; }
-  .pay-name { font-weight: 600; font-size: 15px; }
-  .pay-cond { font-size: 12px; color: var(--text2); margin-top: 4px; }
-  .pay-amount { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; }
-  .pay-footer { display: flex; align-items: center; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
-  .pay-cum { margin-left: auto; font-size: 12px; color: var(--text3); }
-
-  /* ── Log ── */
-  .log-row { padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; color: var(--text2); }
-  .log-row:last-child { border-bottom: none; }
-  .log-time { font-size: 11px; color: var(--text3); display: block; margin-top: 2px; }
-
-  /* ── Loading / empty ── */
-  .loading { text-align: center; padding: 40px; color: var(--text2); font-size: 14px; }
-  .spinner {
-    width: 24px; height: 24px; border: 2px solid var(--border);
-    border-top-color: var(--blue); border-radius: 50%;
-    animation: spin 0.7s linear infinite; margin: 0 auto 12px;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .empty { text-align: center; padding: 32px; color: var(--text3); font-size: 13px; }
-
-  /* ── Alert banner ── */
-  .alert {
-    background: var(--amber-bg); border: 1px solid rgba(146,88,10,0.2);
-    border-radius: var(--radius); padding: 10px 14px;
-    font-size: 13px; color: var(--amber); margin-bottom: 16px;
-    display: none;
-  }
-  .alert.show { display: block; }
-
-  @media (max-width: 640px) {
-    .topbar { padding: 0 16px; }
-    .page { padding: 16px; }
-    .tab { padding: 7px 12px; font-size: 12px; }
-    th, td { padding: 8px 12px; }
-    .metrics { grid-template-columns: repeat(2, 1fr); }
-  }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans, sans-serif); font-size: 15px; color: var(--color-text-primary); background: transparent; padding: 0 0 2rem; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+.header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; padding-top: 1rem; flex-wrap: wrap; gap: 8px; }
+.header h2 { font-size: 18px; font-weight: 500; }
+.header-sub { font-size: 13px; color: var(--color-text-secondary); margin-top: 3px; }
+.saved { font-size: 11px; color: var(--color-text-tertiary); }
+.metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
+.metric { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 12px 14px; }
+.metric-label { font-size: 11px; color: var(--color-text-secondary); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.04em; }
+.metric-value { font-size: 22px; font-weight: 500; }
+.green { color: var(--color-text-success); }
+.amber { color: var(--color-text-warning); }
+.red { color: var(--color-text-danger); }
+.tab-bar { display: flex; border-bottom: 0.5px solid var(--color-border-tertiary); margin-bottom: 1.5rem; }
+.tab { padding: 8px 16px; font-size: 14px; cursor: pointer; color: var(--color-text-secondary); border: none; border-bottom: 2px solid transparent; background: none; font-family: inherit; }
+.tab.active { color: var(--color-text-primary); border-bottom-color: var(--color-text-primary); font-weight: 500; }
+.badge { display: inline-block; font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 99px; white-space: nowrap; }
+.b-done { background: var(--color-background-success); color: var(--color-text-success); }
+.b-partial { background: var(--color-background-warning); color: var(--color-text-warning); }
+.b-pending { background: var(--color-background-secondary); color: var(--color-text-secondary); }
+.b-blocked { background: var(--color-background-danger); color: var(--color-text-danger); }
+.b-info { background: var(--color-background-info); color: var(--color-text-info); }
+.card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); margin-bottom: 10px; overflow: hidden; }
+.card-header { display: flex; align-items: center; gap: 10px; padding: 12px 14px; cursor: pointer; }
+.section-label { font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-text-secondary); }
+.expand { font-size: 13px; color: var(--color-text-tertiary); margin-left: auto; transition: transform 0.2s; }
+.expand.open { transform: rotate(180deg); }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { text-align: left; font-weight: 500; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--color-text-secondary); padding: 8px 14px; border-bottom: 0.5px solid var(--color-border-tertiary); background: var(--color-background-secondary); }
+td { padding: 9px 14px; border-bottom: 0.5px solid var(--color-border-tertiary); vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+.prog-bar { height: 5px; background: var(--color-background-secondary); border-radius: 99px; overflow: hidden; min-width: 60px; }
+.prog-fill { height: 100%; border-radius: 99px; background: var(--color-text-success); }
+.prog-fill.partial { background: var(--color-text-warning); }
+.note-cell { font-size: 12px; color: var(--color-text-secondary); max-width: 160px; }
+.payment-block { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 14px 16px; margin-bottom: 10px; background: var(--color-background-primary); }
+.pay-top { display: flex; justify-content: space-between; align-items: flex-start; }
+.pay-name { font-weight: 500; font-size: 15px; }
+.pay-amount { font-size: 20px; font-weight: 500; }
+.pay-cond { font-size: 13px; color: var(--color-text-secondary); margin-top: 4px; }
+.pay-footer { display: flex; align-items: center; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+select.pay-sel { font-size: 12px; padding: 4px 8px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: var(--color-background-secondary); color: var(--color-text-primary); cursor: pointer; font-family: inherit; }
+.btn { font-size: 13px; padding: 5px 12px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: transparent; color: var(--color-text-primary); cursor: pointer; font-family: inherit; }
+.btn:hover { background: var(--color-background-secondary); }
+.log-row { padding: 7px 0; border-bottom: 0.5px solid var(--color-border-tertiary); font-size: 13px; color: var(--color-text-secondary); }
+.log-row:last-child { border-bottom: none; }
+.log-time { font-size: 11px; color: var(--color-text-tertiary); display: block; }
+.empty { text-align: center; padding: 20px; font-size: 14px; color: var(--color-text-tertiary); }
+.inline-note { font-size: 12px; padding: 3px 6px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: var(--color-background-secondary); color: var(--color-text-primary); font-family: inherit; width: 100%; }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+.dot-done { background: var(--color-text-success); }
+.dot-partial { background: var(--color-text-warning); }
+.dot-pending { background: var(--color-border-secondary); }
+.dot-blocked { background: var(--color-text-danger); }
 </style>
 </head>
 <body>
+<h2 class="sr-only">AIMMEDIA Zambia Campaign Tracker — deliverables and payment dashboard</h2>
 
-<div class="topbar">
-  <div class="topbar-brand">
-    <div class="topbar-logo">
-      <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M3 13L8 3L13 13M5.5 9H10.5" stroke="#7ec99a" stroke-width="1.5" stroke-linecap="round"/>
-      </svg>
-    </div>
-    <span class="topbar-title">AIMMEDIA × AFRI-INVEST</span>
-    <span class="topbar-sub">Zambia Campaign Tracker</span>
+<div class="header">
+  <div>
+    <h2>AIMMEDIA × AFRI-INVEST tracker</h2>
+    <div class="header-sub">Zambia Presidential Campaign · Contract value: USD 27,250</div>
   </div>
-  <div class="topbar-right">
-    <div class="sync-status">
-      <div class="sync-dot" id="sync-dot"></div>
-      <span id="sync-label">Loading…</span>
-    </div>
-  </div>
+  <div id="saved" class="saved"></div>
 </div>
 
-<div class="page">
+<div id="metrics" class="metric-grid"></div>
 
-  <div class="alert" id="err-alert"></div>
-
-  <div class="metrics" id="metrics">
-    <div class="metric"><div class="metric-label">Loading</div><div class="metric-value">—</div></div>
-  </div>
-
-  <div class="tabs">
-    <button class="tab active" onclick="showTab('m1',this)">Month 1 deliverables</button>
-    <button class="tab" onclick="showTab('mou',this)">MOU milestones</button>
-    <button class="tab" onclick="showTab('pay',this)">Payments</button>
-    <button class="tab" onclick="showTab('log',this)">Activity log</button>
-  </div>
-
-  <div id="tab-m1"><div class="loading"><div class="spinner"></div>Loading from Google Sheets…</div></div>
-  <div id="tab-mou" style="display:none"></div>
-  <div id="tab-pay" style="display:none"></div>
-  <div id="tab-log" style="display:none"></div>
-
+<div class="tab-bar">
+  <button class="tab active" onclick="showTab('m1', this)">Month 1 deliverables</button>
+  <button class="tab" onclick="showTab('mou', this)">MOU milestones</button>
+  <button class="tab" onclick="showTab('pay', this)">Payments</button>
+  <button class="tab" onclick="showTab('log', this)">Activity log</button>
 </div>
+
+<div id="tab-m1"></div>
+<div id="tab-mou" style="display:none"></div>
+<div id="tab-pay" style="display:none"></div>
+<div id="tab-log" style="display:none"></div>
 
 <script>
-// ── CONFIG ──────────────────────────────────────────────────────────────────
-const SHEET_ID  = '1oKavAkd50mc8Vis-eC5Nd6eC-VySLGrwZGwCoWp0kzk';
-const API_KEY   = 'AIzaSyBv2tVpO_i2-nmTlm5IBtYFGAZLtJjAYGg';
-const BASE      = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}`;
+const SK = 'aimmedia_v3';
 
-// ── STATIC DATA ─────────────────────────────────────────────────────────────
 const M1 = [
-  { id:'r1', cat:'Audio / Radio',    item:'Master Radio Ad (60 sec)',              qty:1,  submitted:1, aiStatus:'Done',        note:'Script done as main TVC' },
-  { id:'r2', cat:'Audio / Radio',    item:'Support Radio Ads (45 sec)',            qty:3,  submitted:5, aiStatus:'In progress', note:'5 completed, 2 carried to Month 2 (local translations)' },
-  { id:'r3', cat:'Audio / Radio',    item:'WhatsApp Audio Assets',                qty:3,  submitted:0, aiStatus:'Pending',     note:'' },
-  { id:'r4', cat:'Audio / Radio',    item:'Presenter Mentions / Live Reads',      qty:10, submitted:5, aiStatus:'Partial',     note:'5 pending approval' },
-  { id:'r5', cat:'Audio / Radio',    item:'Hour Check / Bally Checks',            qty:9,  submitted:9, aiStatus:'Done',        note:'Scripts done, 9 pending approval' },
-  { id:'v1', cat:'Video / TV',       item:'Master TVC / Film (60 sec)',            qty:1,  submitted:1, aiStatus:'Done',        note:'Script done' },
-  { id:'v2', cat:'Video / TV',       item:'Human Interest TVCs / Testimonials',   qty:3,  submitted:0, aiStatus:'Pending',     note:'' },
-  { id:'v3', cat:'Video / TV',       item:'Digital Cutdowns (15–30 sec)',          qty:15, submitted:0, aiStatus:'Pending',     note:'' },
-  { id:'v4', cat:'Video / TV',       item:'Citizen Testimonial Clips at Rally',   qty:6,  submitted:0, aiStatus:'Pending',     note:'Pending rally schedule' },
-  { id:'v5', cat:'Video / TV',       item:'Rally / Activation AV Assets',         qty:2,  submitted:0, aiStatus:'Pending',     note:'Pending rally schedule' },
-  { id:'g1', cat:'Graphics / Digital', item:'Quote Cards / Graphics',             qty:15, submitted:0, aiStatus:'Pending',     note:'' },
-  { id:'g2', cat:'Graphics / Digital', item:'Social Statics / Carousels',         qty:15, submitted:0, aiStatus:'Pending',     note:'' },
-  { id:'b1', cat:'Branding',         item:'Campaign Mnemonic & Audio Branding',   qty:1,  submitted:0, aiStatus:'Pending',     note:'Zambian team dependency' },
+  { id:'r1', cat:'Audio / Radio', item:'Master Radio Ad (60 sec)', qty:1, submitted:1, aiStatus:'Done', note:'Script done as main TVC' },
+  { id:'r2', cat:'Audio / Radio', item:'Support Radio Ads (45 sec)', qty:3, submitted:5, aiStatus:'In progress', note:'5 completed, 2 carried to Month 2 (local translations)' },
+  { id:'r3', cat:'Audio / Radio', item:'WhatsApp Audio Assets', qty:3, submitted:0, aiStatus:'Pending', note:'' },
+  { id:'r4', cat:'Audio / Radio', item:'Presenter Mentions / Live Reads', qty:10, submitted:5, aiStatus:'Partial', note:'5 pending approval' },
+  { id:'r5', cat:'Audio / Radio', item:'Hour Check / Bally Checks', qty:9, submitted:9, aiStatus:'Done', note:'Scripts done, 9 pending approval' },
+  { id:'v1', cat:'Video / TV', item:'Master TVC / Film (60 sec)', qty:1, submitted:1, aiStatus:'Done', note:'Script done' },
+  { id:'v2', cat:'Video / TV', item:'Human Interest TVCs / Testimonial Films', qty:3, submitted:0, aiStatus:'Pending', note:'' },
+  { id:'v3', cat:'Video / TV', item:'Digital Cutdowns (15–30 sec)', qty:15, submitted:0, aiStatus:'Pending', note:'' },
+  { id:'v4', cat:'Video / TV', item:'Citizen Testimonial Clips at Rally', qty:6, submitted:0, aiStatus:'Pending', note:'Pending rally schedule' },
+  { id:'v5', cat:'Video / TV', item:'Rally / Activation AV Assets', qty:2, submitted:0, aiStatus:'Pending', note:'Pending rally schedule' },
+  { id:'g1', cat:'Graphics / Digital', item:'Quote Cards / Graphics', qty:15, submitted:0, aiStatus:'Pending', note:'' },
+  { id:'g2', cat:'Graphics / Digital', item:'Social Statics / Carousels', qty:15, submitted:0, aiStatus:'Pending', note:'' },
+  { id:'b1', cat:'Branding', item:'Campaign Mnemonic & Audio Branding', qty:1, submitted:0, aiStatus:'Pending', note:'Zambian team dependency' },
 ];
 
 const MOU_SECTIONS = [
@@ -278,426 +119,225 @@ const MOU_SECTIONS = [
     { id:'ms2a', label:'Media planning & buying recommendations' },
     { id:'ms2b', label:'Campaign implementation updates' },
     { id:'ms2c', label:'Strategic recommendations' },
-    { id:'ms2d', label:'Phase 1 progress report (triggers 50% payment)' },
-    { id:'ms2e', label:'Final project report (triggers final 25% payment)' },
+    { id:'ms2d', label:'Phase 1 progress report (payment trigger)' },
+    { id:'ms2e', label:'Final project report (payment trigger)' },
   ]},
 ];
 
 const PAYS = [
-  { id:'p1', label:'First payment — 25%',  amount:6813,  cond:'Due upon MOU signing & valid invoice',                      trigger:'MOU signed' },
-  { id:'p2', label:'Second payment — 50%', amount:13625, cond:'Phase 1 complete + progress report submitted',              trigger:'Phase 1 complete' },
-  { id:'p3', label:'Final payment — 25%',  amount:6812,  cond:'All deliverables complete + final report submitted',         trigger:'All deliverables done' },
+  { id:'p1', label:'First payment — 25%', amount:6813, cond:'Due upon MOU signing & valid invoice', trigger:'MOU signed' },
+  { id:'p2', label:'Second payment — 50%', amount:13625, cond:'Phase 1 complete + progress report submitted', trigger:'Phase 1 + report' },
+  { id:'p3', label:'Final payment — 25%', amount:6812, cond:'All deliverables complete + final report submitted', trigger:'All done' },
 ];
 
-// ── STATE (loaded from / saved to Sheets) ───────────────────────────────────
-let STATE = {
-  m1verified: {},   // id → 'unverified'|'verified'|'disputed'
-  m1notes:    {},   // id → string
-  mouChecks:  {},   // id → bool
-  mouNotes:   {},   // id → string
-  payStatus:  {},   // id → 'pending'|'invoiced'|'paid'|'overdue'
-  log:        [],   // [{t, msg}]
-  openSections: {},
-};
+let ST = { m1notes:{}, m1verified:{}, mouChecks:{}, mouNotes:{}, payStatus:{}, log:[], openSections:{} };
 
-let saving = false;
+const cats = [...new Set(M1.map(d=>d.cat))];
 
-// ── SHEETS API ───────────────────────────────────────────────────────────────
-async function sheetsGet(range) {
-  const url = `${BASE}/values/${encodeURIComponent(range)}?key=${API_KEY}`;
-  const r = await fetch(url);
-  if (!r.ok) throw new Error(`Sheets read error: ${r.status}`);
-  return r.json();
+async function load() {
+  try { const r = await window.storage.get(SK); if(r?.value) ST = {...ST,...JSON.parse(r.value)}; } catch(e){}
+  render();
 }
-
-async function sheetsWrite(range, values) {
-  const url = `${BASE}/values/${encodeURIComponent(range)}?valueInputOption=RAW&key=${API_KEY}`;
-  const r = await fetch(url, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ range, majorDimension: 'ROWS', values }),
-  });
-  if (!r.ok) {
-    const body = await r.json().catch(()=>({}));
-    throw new Error(body.error?.message || `Sheets write error: ${r.status}`);
-  }
-  return r.json();
+async function save() {
+  try { await window.storage.set(SK, JSON.stringify(ST)); document.getElementById('saved').textContent = 'Saved '+new Date().toLocaleTimeString(); } catch(e){}
 }
+function log(msg) { ST.log.unshift({msg, t:new Date().toLocaleString()}); if(ST.log.length>60) ST.log=ST.log.slice(0,60); }
 
-async function sheetsClear(range) {
-  const url = `${BASE}/values/${encodeURIComponent(range)}:clear?key=${API_KEY}`;
-  const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' } });
-  if (!r.ok) throw new Error(`Sheets clear error: ${r.status}`);
-}
-
-// ── LOAD FROM SHEETS ─────────────────────────────────────────────────────────
-async function loadFromSheets() {
-  setSyncStatus('syncing', 'Loading…');
-  try {
-    // m1_deliverables: id | verified | note
-    const d1 = await sheetsGet('m1_deliverables!A2:C200');
-    (d1.values || []).forEach(row => {
-      if (row[0]) {
-        STATE.m1verified[row[0]] = row[1] || 'unverified';
-        STATE.m1notes[row[0]]    = row[2] || '';
-      }
-    });
-
-    // mou_milestones: id | checked | note
-    const d2 = await sheetsGet('mou_milestones!A2:C200');
-    (d2.values || []).forEach(row => {
-      if (row[0]) {
-        STATE.mouChecks[row[0]] = row[1] === 'TRUE';
-        STATE.mouNotes[row[0]]  = row[2] || '';
-      }
-    });
-
-    // payments: id | status
-    const d3 = await sheetsGet('payments!A2:B20');
-    (d3.values || []).forEach(row => {
-      if (row[0]) STATE.payStatus[row[0]] = row[1] || 'pending';
-    });
-
-    // activity_log: timestamp | message
-    const d4 = await sheetsGet('activity_log!A2:B200');
-    STATE.log = (d4.values || []).map(row => ({ t: row[0]||'', msg: row[1]||'' }));
-
-    setSyncStatus('ok', 'Synced ' + new Date().toLocaleTimeString());
-    render();
-  } catch(e) {
-    setSyncStatus('err', 'Sync failed');
-    showAlert('Could not load data from Google Sheets. Check your API key and sheet permissions. Error: ' + e.message);
-    render();
-  }
-}
-
-// ── SAVE TO SHEETS ───────────────────────────────────────────────────────────
-async function saveM1() {
-  const rows = M1.map(d => [d.id, STATE.m1verified[d.id]||'unverified', STATE.m1notes[d.id]||'']);
-  await sheetsClear('m1_deliverables!A2:C200');
-  await sheetsWrite('m1_deliverables!A2', [['id','verified','note'], ...rows]);
-}
-
-async function saveMOU() {
-  const rows = MOU_SECTIONS.flatMap(s => s.items.map(i => [i.id, STATE.mouChecks[i.id] ? 'TRUE' : 'FALSE', STATE.mouNotes[i.id]||'']));
-  await sheetsClear('mou_milestones!A2:C200');
-  await sheetsWrite('mou_milestones!A2', [['id','checked','note'], ...rows]);
-}
-
-async function savePayments() {
-  const rows = PAYS.map(p => [p.id, STATE.payStatus[p.id]||'pending']);
-  await sheetsClear('payments!A2:B20');
-  await sheetsWrite('payments!A2', [['id','status'], ...rows]);
-}
-
-async function saveLog() {
-  const rows = STATE.log.slice(0, 100).map(e => [e.t, e.msg]);
-  await sheetsClear('activity_log!A2:B200');
-  if (rows.length) await sheetsWrite('activity_log!A2', rows);
-}
-
-async function initSheetHeaders() {
-  // Write headers to all tabs (safe to repeat — they're in row 1)
-  await sheetsWrite('m1_deliverables!A1', [['id','verified','note']]);
-  await sheetsWrite('mou_milestones!A1',  [['id','checked','note']]);
-  await sheetsWrite('payments!A1',        [['id','status']]);
-  await sheetsWrite('activity_log!A1',   [['timestamp','message']]);
-}
-
-function addLog(msg) {
-  STATE.log.unshift({ t: new Date().toLocaleString(), msg });
-  if (STATE.log.length > 100) STATE.log = STATE.log.slice(0, 100);
-}
-
-async function withSync(fn, saveFn) {
-  if (saving) return;
-  saving = true;
-  setSyncStatus('syncing', 'Saving…');
-  try {
-    fn();
-    await saveFn();
-    await saveLog();
-    setSyncStatus('ok', 'Saved ' + new Date().toLocaleTimeString());
-  } catch(e) {
-    setSyncStatus('err', 'Save failed');
-    showAlert('Could not save to Google Sheets: ' + e.message);
-  } finally {
-    saving = false;
-  }
-  renderMetrics();
-  renderLog();
-}
-
-// ── UI HELPERS ───────────────────────────────────────────────────────────────
-function setSyncStatus(state, label) {
-  const dot = document.getElementById('sync-dot');
-  const lbl = document.getElementById('sync-label');
-  dot.className = 'sync-dot ' + state;
-  lbl.textContent = label;
-}
-
-function showAlert(msg) {
-  const el = document.getElementById('err-alert');
-  el.textContent = msg;
-  el.classList.add('show');
-}
-
-function aiStatusBadge(d) {
-  if (d.submitted >= d.qty || d.aiStatus === 'Done') return '<span class="badge b-done">Done</span>';
-  if (d.aiStatus === 'In progress' || d.aiStatus === 'Partial' || (d.submitted > 0 && d.submitted < d.qty))
-    return '<span class="badge b-partial">Partial</span>';
-  return '<span class="badge b-pending">Pending</span>';
+function aiStatusBadge(s, sub, qty) {
+  if(s==='Done'||sub>=qty) return '<span class="badge b-done">Done</span>';
+  if(s==='In progress'||s==='Partial'||(sub>0&&sub<qty)) return '<span class="badge b-partial">Partial</span>';
+  if(s==='Pending'&&sub===0) return '<span class="badge b-pending">Pending</span>';
+  return '<span class="badge b-pending">'+s+'</span>';
 }
 
 function verBadge(id) {
-  const v = STATE.m1verified[id] || 'unverified';
-  if (v === 'verified')  return '<span class="badge b-done">Verified ✓</span>';
-  if (v === 'disputed')  return '<span class="badge b-blocked">Disputed</span>';
+  const v = ST.m1verified[id]||'unverified';
+  if(v==='verified') return '<span class="badge b-done">Verified ✓</span>';
+  if(v==='disputed') return '<span class="badge b-blocked">Disputed</span>';
   return '<span class="badge b-pending">Unverified</span>';
 }
 
+function mouBadge(id) {
+  return ST.mouChecks[id] ? '<span class="badge b-done">Done</span>' : '<span class="badge b-pending">Pending</span>';
+}
+
 function payBadge(id) {
-  const s = STATE.payStatus[id] || 'pending';
-  if (s === 'paid')     return '<span class="badge b-done">Paid</span>';
-  if (s === 'invoiced') return '<span class="badge b-partial">Invoiced</span>';
-  if (s === 'overdue')  return '<span class="badge b-blocked">Overdue</span>';
+  const s = ST.payStatus[id]||'pending';
+  if(s==='paid') return '<span class="badge b-done">Paid</span>';
+  if(s==='invoiced') return '<span class="badge b-partial">Invoiced</span>';
+  if(s==='overdue') return '<span class="badge b-blocked">Overdue</span>';
   return '<span class="badge b-pending">Pending</span>';
 }
 
-function showTab(tab, btn) {
-  ['m1','mou','pay','log'].forEach(t => {
-    document.getElementById('tab-' + t).style.display = t === tab ? '' : 'none';
-  });
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  btn.classList.add('active');
-}
-
-function toggleSec(id) {
-  STATE.openSections[id] = !(STATE.openSections[id] !== false);
-  renderM1();
-  renderMOU();
-}
-
-// ── RENDER ───────────────────────────────────────────────────────────────────
-function renderMetrics() {
-  const m1done    = M1.filter(d => d.submitted >= d.qty || d.aiStatus === 'Done').length;
-  const unitsDone = M1.reduce((a, d) => a + Math.min(d.submitted, d.qty), 0);
-  const unitsTotal= M1.reduce((a, d) => a + d.qty, 0);
-  const verified  = M1.filter(d => (STATE.m1verified[d.id] || 'unverified') === 'verified').length;
-  const paid      = PAYS.filter(p => STATE.payStatus[p.id] === 'paid').reduce((a, p) => a + p.amount, 0);
-  const pct       = Math.round(unitsDone / unitsTotal * 100);
-
-  document.getElementById('metrics').innerHTML = `
-    <div class="metric"><div class="metric-label">M1 line items done</div>
-      <div class="metric-value ${m1done === M1.length ? 'green' : m1done > 5 ? 'amber' : 'red'}">${m1done} / ${M1.length}</div></div>
-    <div class="metric"><div class="metric-label">Units delivered</div>
-      <div class="metric-value ${pct > 80 ? 'green' : pct > 40 ? 'amber' : 'red'}">${unitsDone} / ${unitsTotal}</div></div>
-    <div class="metric"><div class="metric-label">AFRI-INVEST verified</div>
-      <div class="metric-value ${verified > 6 ? 'green' : verified > 2 ? 'amber' : 'red'}">${verified} / ${M1.length}</div></div>
-    <div class="metric"><div class="metric-label">Paid to date</div>
-      <div class="metric-value green">$${paid.toLocaleString()}</div></div>
-    <div class="metric"><div class="metric-label">Outstanding</div>
-      <div class="metric-value amber">$${(27250 - paid).toLocaleString()}</div></div>
+function metrics() {
+  const m1done = M1.filter(d=>d.submitted>=d.qty||d.aiStatus==='Done').length;
+  const m1total = M1.length;
+  const m1unitsDone = M1.reduce((a,d)=>a+Math.min(d.submitted,d.qty),0);
+  const m1unitsTotal = M1.reduce((a,d)=>a+d.qty,0);
+  const verified = M1.filter(d=>ST.m1verified[d.id]==='verified').length;
+  const paid = PAYS.filter(p=>ST.payStatus[p.id]==='paid').reduce((a,p)=>a+p.amount,0);
+  const pct = Math.round(m1unitsDone/m1unitsTotal*100);
+  document.getElementById('metrics').innerHTML=`
+    <div class="metric"><div class="metric-label">M1 line items</div><div class="metric-value ${m1done===m1total?'green':m1done>4?'amber':'red'}">${m1done}/${m1total}</div></div>
+    <div class="metric"><div class="metric-label">Units delivered</div><div class="metric-value ${pct>80?'green':pct>40?'amber':'red'}">${m1unitsDone}/${m1unitsTotal}</div></div>
+    <div class="metric"><div class="metric-label">AFRI-invest verified</div><div class="metric-value ${verified>5?'green':verified>2?'amber':'red'}">${verified}/${m1total}</div></div>
+    <div class="metric"><div class="metric-label">Paid to date</div><div class="metric-value green">$${paid.toLocaleString()}</div></div>
+    <div class="metric"><div class="metric-label">Outstanding</div><div class="metric-value amber">$${(27250-paid).toLocaleString()}</div></div>
   `;
 }
 
 function renderM1() {
-  const cats = [...new Set(M1.map(d => d.cat))];
-  let html = '';
-  for (const cat of cats) {
-    const items = M1.filter(d => d.cat === cat);
-    const key   = 'm1_' + cat.replace(/[\/ ]/g, '_');
-    const open  = STATE.openSections[key] !== false;
-    const done  = items.filter(d => d.submitted >= d.qty || d.aiStatus === 'Done').length;
-
-    html += `<div class="section-card">
-      <div class="section-header" onclick="toggleSec('${key}')">
-        <span class="section-label">${cat}</span>
-        <span class="badge b-info" style="margin-left:auto;margin-right:8px">${done}/${items.length}</span>
-        <span class="section-chevron ${open ? 'open' : ''}">▾</span>
-      </div>`;
-
-    if (open) {
-      html += `<table><thead><tr>
-        <th style="width:32%">Deliverable</th>
-        <th style="width:8%">Qty</th>
-        <th style="width:14%">Submitted</th>
-        <th style="width:12%">AIMMEDIA status</th>
-        <th style="width:14%">Your verification</th>
-        <th>Notes</th>
+  let html='';
+  for(const cat of cats) {
+    const items = M1.filter(d=>d.cat===cat);
+    const open = ST.openSections['m1_'+cat]!==false;
+    html+=`<div class="card"><div class="card-header" onclick="toggleSec('m1_${cat.replace(/\//g,'_').replace(/ /g,'_')}')">
+      <span class="section-label">${cat}</span>
+      <span class="badge b-info" style="margin-left:auto;margin-right:8px">${items.filter(d=>d.submitted>=d.qty||d.aiStatus==='Done').length}/${items.length}</span>
+      <span class="expand ${open?'open':''}"><i class="ti ti-chevron-down" aria-hidden="true"></i></span>
+    </div>`;
+    if(open){
+      html+=`<table><thead><tr>
+        <th style="width:30%">Deliverable</th>
+        <th style="width:10%">Qty</th>
+        <th style="width:12%">Submitted</th>
+        <th style="width:11%">AIMMEDIA</th>
+        <th style="width:12%">Verified by you</th>
+        <th>Notes / remarks</th>
       </tr></thead><tbody>`;
-
-      for (const d of items) {
-        const pct  = d.qty > 0 ? Math.min(100, Math.round(d.submitted / d.qty * 100)) : 0;
-        const ver  = STATE.m1verified[d.id] || 'unverified';
-        const note = STATE.m1notes[d.id] || '';
-        html += `<tr>
+      for(const d of items){
+        const pct=d.qty>0?Math.min(100,Math.round(d.submitted/d.qty*100)):0;
+        const ver=ST.m1verified[d.id]||'unverified';
+        const note=ST.m1notes[d.id]||'';
+        html+=`<tr>
+          <td style="font-size:13px">${d.item}${d.note?`<div style="font-size:11px;color:var(--color-text-secondary);margin-top:2px">${d.note}</div>`:''}</td>
+          <td style="font-size:13px">${d.qty}</td>
           <td>
-            <div style="font-weight:500">${d.item}</div>
-            ${d.note ? `<div style="font-size:11px;color:var(--text2);margin-top:2px">${d.note}</div>` : ''}
-          </td>
-          <td>${d.qty}</td>
-          <td>
-            <div style="display:flex;align-items:center;gap:7px">
-              <span style="font-weight:500;min-width:16px">${d.submitted}</span>
-              <div class="prog"><div class="prog-fill ${pct < 100 ? 'partial' : ''}" style="width:${pct}%"></div></div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <span style="font-size:13px;font-weight:500">${d.submitted}</span>
+              <div class="prog-bar"><div class="prog-fill ${pct<100?'partial':''}" style="width:${pct}%"></div></div>
             </div>
           </td>
-          <td>${aiStatusBadge(d)}</td>
+          <td>${aiStatusBadge(d.aiStatus,d.submitted,d.qty)}</td>
           <td>
-            <select onchange="setVer('${d.id}', '${d.item.replace(/'/g, "\\'")}', this.value)">
-              <option value="unverified" ${ver === 'unverified' ? 'selected' : ''}>Unverified</option>
-              <option value="verified"   ${ver === 'verified'   ? 'selected' : ''}>Verified ✓</option>
-              <option value="disputed"   ${ver === 'disputed'   ? 'selected' : ''}>Disputed</option>
+            <select style="font-size:11px;padding:3px 5px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);color:var(--color-text-primary);cursor:pointer;font-family:inherit" onchange="setVer('${d.id}','${d.item.replace(/'/g,"\\'").replace(/\//g,'_')}',this.value)">
+              <option value="unverified" ${ver==='unverified'?'selected':''}>Unverified</option>
+              <option value="verified" ${ver==='verified'?'selected':''}>Verified ✓</option>
+              <option value="disputed" ${ver==='disputed'?'selected':''}>Disputed</option>
             </select>
           </td>
-          <td><input class="note" type="text" placeholder="Add note…" value="${note.replace(/"/g,'&quot;')}"
-               onblur="setM1Note('${d.id}', this.value)"></td>
+          <td><input class="inline-note" type="text" placeholder="Add note…" value="${note}" onblur="setNote('${d.id}',this.value)"></td>
         </tr>`;
       }
-      html += `</tbody></table>`;
+      html+=`</tbody></table>`;
     }
-    html += `</div>`;
+    html+=`</div>`;
   }
-  document.getElementById('tab-m1').innerHTML = html;
+  document.getElementById('tab-m1').innerHTML=html;
 }
 
 function renderMOU() {
-  let html = '';
-  for (const sec of MOU_SECTIONS) {
-    const key  = 'mou_' + sec.id;
-    const open = STATE.openSections[key] !== false;
-    const done = sec.items.filter(i => STATE.mouChecks[i.id]).length;
-
-    html += `<div class="section-card">
-      <div class="section-header" onclick="toggleSec('${key}')">
-        <span class="section-label">${sec.label}</span>
-        <span class="badge b-info" style="margin-left:auto;margin-right:8px">${done}/${sec.items.length}</span>
-        <span class="section-chevron ${open ? 'open' : ''}">▾</span>
-      </div>`;
-
-    if (open) {
-      html += `<div style="padding:6px 18px 12px">`;
-      for (const item of sec.items) {
-        const checked = !!STATE.mouChecks[item.id];
-        const note    = STATE.mouNotes[item.id] || '';
-        html += `<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)">
-          <input type="checkbox" id="mc_${item.id}" ${checked ? 'checked' : ''}
-                 onchange="toggleMOU('${item.id}', '${item.label.replace(/'/g,"\\'")}')">
-          <label for="mc_${item.id}" style="flex:1;cursor:pointer;${checked ? 'text-decoration:line-through;color:var(--text2)' : ''}">${item.label}</label>
-          ${checked ? '<span class="badge b-done">Done</span>' : '<span class="badge b-pending">Pending</span>'}
-          <input class="note" type="text" placeholder="Note…" value="${note.replace(/"/g,'&quot;')}"
-                 onblur="setMOUNote('${item.id}', this.value)" style="max-width:200px">
+  let html='';
+  for(const sec of MOU_SECTIONS){
+    const open=ST.openSections['mou_'+sec.id]!==false;
+    const done=sec.items.filter(i=>ST.mouChecks[i.id]).length;
+    html+=`<div class="card"><div class="card-header" onclick="toggleSec('mou_${sec.id}')">
+      <span class="section-label">${sec.label}</span>
+      <span class="badge b-info" style="margin-left:auto;margin-right:8px">${done}/${sec.items.length}</span>
+      <span class="expand ${open?'open':''}"><i class="ti ti-chevron-down" aria-hidden="true"></i></span>
+    </div>`;
+    if(open){
+      html+=`<div style="padding:4px 14px 10px">`;
+      for(const item of sec.items){
+        const checked=!!ST.mouChecks[item.id];
+        const note=ST.mouNotes[item.id]||'';
+        html+=`<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:0.5px solid var(--color-border-tertiary)">
+          <input type="checkbox" id="mc_${item.id}" ${checked?'checked':''} onchange="toggleMOU('${item.id}','${item.label.replace(/'/g,"\\'")}')">
+          <label for="mc_${item.id}" style="flex:1;font-size:14px;color:var(--color-text-primary);${checked?'text-decoration:line-through;color:var(--color-text-secondary)':''}">${item.label}</label>
+          ${mouBadge(item.id)}
+          <input class="inline-note" type="text" placeholder="Note…" value="${note}" onblur="setMOUNote('${item.id}',this.value)" style="max-width:180px">
         </div>`;
       }
-      html += `</div>`;
+      html+=`</div>`;
     }
-    html += `</div>`;
+    html+=`</div>`;
   }
-  document.getElementById('tab-mou').innerHTML = html;
+  document.getElementById('tab-mou').innerHTML=html;
 }
 
 function renderPay() {
-  let cum = 0;
-  let html = '';
-  for (const p of PAYS) {
-    cum += p.amount;
-    const s = STATE.payStatus[p.id] || 'pending';
-    html += `<div class="pay-block">
+  let cum=0;
+  let html='<div style="padding-top:4px">';
+  for(const p of PAYS){
+    cum+=p.amount;
+    const s=ST.payStatus[p.id]||'pending';
+    html+=`<div class="payment-block">
       <div class="pay-top">
-        <div>
-          <div class="pay-name">${p.label}</div>
-          <div class="pay-cond">${p.cond}</div>
-        </div>
+        <div><div class="pay-name">${p.label}</div><div class="pay-cond">${p.cond}</div></div>
         <div class="pay-amount">$${p.amount.toLocaleString()}</div>
       </div>
       <div class="pay-footer">
         ${payBadge(p.id)}
-        <select class="pay-sel" onchange="setPay('${p.id}', '${p.label}', this.value)">
-          <option value="pending"  ${s === 'pending'  ? 'selected' : ''}>Pending</option>
-          <option value="invoiced" ${s === 'invoiced' ? 'selected' : ''}>Invoiced</option>
-          <option value="paid"     ${s === 'paid'     ? 'selected' : ''}>Paid</option>
-          <option value="overdue"  ${s === 'overdue'  ? 'selected' : ''}>Overdue</option>
+        <select class="pay-sel" onchange="setPay('${p.id}','${p.label.replace(/'/g,"\\'")}',this.value)">
+          <option value="pending" ${s==='pending'?'selected':''}>Pending</option>
+          <option value="invoiced" ${s==='invoiced'?'selected':''}>Invoiced</option>
+          <option value="paid" ${s==='paid'?'selected':''}>Paid</option>
+          <option value="overdue" ${s==='overdue'?'selected':''}>Overdue</option>
         </select>
-        <span class="pay-cum">Cumulative: $${cum.toLocaleString()}</span>
+        <span style="margin-left:auto;font-size:12px;color:var(--color-text-tertiary)">Cumulative: $${cum.toLocaleString()}</span>
       </div>
     </div>`;
   }
-  html += `<div style="font-size:12px;color:var(--text2);margin-top:8px;padding:10px 4px;border-top:1px solid var(--border)">
+  html+=`<div style="font-size:12px;color:var(--color-text-secondary);margin-top:4px;padding:8px 4px;border-top:0.5px solid var(--color-border-tertiary)">
     Bank: Exim Bank · USD Account 0320000601 · Payment due within 3 working days of valid invoice
-  </div>`;
-  document.getElementById('tab-pay').innerHTML = html;
+  </div></div>`;
+  document.getElementById('tab-pay').innerHTML=html;
 }
 
 function renderLog() {
-  const el = document.getElementById('tab-log');
-  if (!STATE.log.length) {
-    el.innerHTML = '<div class="empty">No activity yet. Changes you make are logged here automatically.</div>';
-    return;
-  }
-  let html = '<div class="section-card"><div style="padding:4px 18px">';
-  for (const e of STATE.log) {
-    html += `<div class="log-row">${e.msg}<span class="log-time">${e.t}</span></div>`;
-  }
-  html += '</div></div>';
-  el.innerHTML = html;
+  const el=document.getElementById('tab-log');
+  if(!ST.log.length){ el.innerHTML='<div class="empty">No activity yet. Changes you make are logged here.</div>'; return; }
+  let html='<div class="card"><div style="padding:6px 14px">';
+  for(const e of ST.log) html+=`<div class="log-row">${e.msg}<span class="log-time">${e.t}</span></div>`;
+  html+='</div></div>';
+  el.innerHTML=html;
 }
 
-function render() {
-  renderMetrics();
-  renderM1();
-  renderMOU();
-  renderPay();
-  renderLog();
+function render() { metrics(); renderM1(); renderMOU(); renderPay(); renderLog(); }
+
+function showTab(tab, btn) {
+  ['m1','mou','pay','log'].forEach(t=>document.getElementById('tab-'+t).style.display=t===tab?'':'none');
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
 }
 
-// ── ACTIONS ──────────────────────────────────────────────────────────────────
+function toggleSec(id) {
+  ST.openSections[id]=!(ST.openSections[id]!==false);
+  renderM1(); renderMOU();
+}
+
 function setVer(id, label, val) {
-  withSync(
-    () => { STATE.m1verified[id] = val; addLog(`Verification: "${label}" → ${val}`); },
-    () => saveM1()
-  ).then(() => renderM1());
+  log('Verification updated: "'+label+'" → '+val);
+  ST.m1verified[id]=val; save(); metrics(); renderLog();
+  // re-render just verification dropdowns without full re-render to avoid losing focus
+  renderM1();
 }
 
-function setM1Note(id, val) {
-  if ((STATE.m1notes[id] || '') === val) return;
-  withSync(
-    () => { STATE.m1notes[id] = val; },
-    () => saveM1()
-  );
-}
+function setNote(id, val) { ST.m1notes[id]=val; save(); }
+function setMOUNote(id, val) { ST.mouNotes[id]=val; save(); }
 
 function toggleMOU(id, label) {
-  withSync(
-    () => { STATE.mouChecks[id] = !STATE.mouChecks[id]; addLog((STATE.mouChecks[id] ? '✓ Completed: ' : '○ Reopened: ') + label); },
-    () => saveMOU()
-  ).then(() => renderMOU());
-}
-
-function setMOUNote(id, val) {
-  if ((STATE.mouNotes[id] || '') === val) return;
-  withSync(
-    () => { STATE.mouNotes[id] = val; },
-    () => saveMOU()
-  );
+  ST.mouChecks[id]=!ST.mouChecks[id];
+  log((ST.mouChecks[id]?'✓ Completed: ':'○ Reopened: ')+label);
+  save(); renderMOU(); renderLog(); metrics();
 }
 
 function setPay(id, label, val) {
-  withSync(
-    () => { STATE.payStatus[id] = val; addLog(`Payment status: "${label}" → ${val}`); },
-    () => savePayments()
-  ).then(() => renderPay());
+  log('Payment status: "'+label+'" → '+val);
+  ST.payStatus[id]=val; save(); renderPay(); renderLog(); metrics();
 }
 
-// ── INIT ─────────────────────────────────────────────────────────────────────
-(async () => {
-  try {
-    await initSheetHeaders();
-  } catch(e) {
-    // Headers may already exist — not fatal
-  }
-  await loadFromSheets();
-})();
+load();
 </script>
 </body>
 </html>

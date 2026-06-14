@@ -268,22 +268,30 @@ async function withSync(mutateFn, saveFn) {
   renderMetrics(); renderLog();
 }
 
+function padRows(rows, cols) {
+  return rows.map(r => {
+    const padded = [...r];
+    while (padded.length < cols) padded.push('');
+    return padded.slice(0, cols);
+  });
+}
+
 async function saveM1() {
   await scriptWrite('clear', 'm1_deliverables!A2:J300');
-  if (M1_DATA.length) await scriptWrite('write', 'm1_deliverables!A2', M1_DATA.map(r=>[...r]));
+  if (M1_DATA.length) await scriptWrite('write', 'm1_deliverables!A2', padRows(M1_DATA, 10));
 }
 async function saveMOU() {
   await scriptWrite('clear', 'mou_milestones!A2:E200');
-  if (MOU_DATA.length) await scriptWrite('write', 'mou_milestones!A2', MOU_DATA.map(r=>[...r]));
+  if (MOU_DATA.length) await scriptWrite('write', 'mou_milestones!A2', padRows(MOU_DATA, 5));
 }
 async function savePay() {
   await scriptWrite('clear', 'payments!A2:E20');
-  if (PAY_DATA.length) await scriptWrite('write', 'payments!A2', PAY_DATA.map(r=>[...r]));
+  if (PAY_DATA.length) await scriptWrite('write', 'payments!A2', padRows(PAY_DATA, 5));
 }
 async function saveLog() {
   const rows = LOG_DATA.slice(0, 100);
   await scriptWrite('clear', 'activity_log!A2:B300');
-  if (rows.length) await scriptWrite('write', 'activity_log!A2', rows);
+  if (rows.length) await scriptWrite('write', 'activity_log!A2', padRows(rows, 2));
 }
 function addLog(msg) {
   LOG_DATA.unshift([new Date().toLocaleString(), msg]);

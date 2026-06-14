@@ -230,6 +230,11 @@ async function scriptWrite(action, range, values) {
 
 
 // ── LOAD ─────────────────────────────────────────────────────────────────────
+function notEmpty(row) {
+  // A row is valid only if its first cell (id) has actual content
+  return row && row.length > 0 && String(row[0]).trim() !== '';
+}
+
 async function loadAll() {
   setSyncStatus('syncing', 'Loading…');
   try {
@@ -239,10 +244,10 @@ async function loadAll() {
       sheetsRead('payments!A1:E20'),
       sheetsRead('activity_log!A1:B300'),
     ]);
-    M1_DATA  = d1.slice(1);
-    MOU_DATA = d2.slice(1);
-    PAY_DATA = d3.slice(1);
-    LOG_DATA = d4.slice(1);
+    M1_DATA  = d1.slice(1).filter(notEmpty);
+    MOU_DATA = d2.slice(1).filter(notEmpty);
+    PAY_DATA = d3.slice(1).filter(notEmpty);
+    LOG_DATA = d4.slice(1).filter(r => r && r.length > 0 && String(r[0]).trim() !== '');
     setSyncStatus('ok', 'Synced ' + new Date().toLocaleTimeString());
     render();
   } catch(e) {

@@ -318,7 +318,7 @@ function setAfriNote(rowIdx, val) {
 }
 function toggleMOU(rowIdx, label) {
   withSync(()=>{
-    const cur = MOU_DATA[rowIdx][MOUC.checked]==='TRUE';
+    const cur = isChecked(MOU_DATA[rowIdx][MOUC.checked]);
     MOU_DATA[rowIdx][MOUC.checked] = cur ? 'FALSE' : 'TRUE';
     addLog((cur?'○ Reopened: ':'✓ Completed: ')+label);
   }, saveMOU).then(()=>renderMOU());
@@ -459,6 +459,10 @@ function renderM1() {
   });
 }
 
+function isChecked(val) {
+  return val === true || val === 'TRUE' || val === 'true';
+}
+
 function renderMOU() {
   if (!MOU_DATA.length) { document.getElementById('tab-mou').innerHTML='<div class="empty">No MOU milestone data found.</div>'; return; }
   const sections = [...new Set(MOU_DATA.map(r=>r[MOUC.section]||'General'))];
@@ -467,7 +471,7 @@ function renderMOU() {
     const rows = MOU_DATA.map((r,i)=>({r,i})).filter(({r})=>(r[MOUC.section]||'General')===sec);
     const key  = 'mou_'+sec.replace(/[^a-z0-9]/gi,'_');
     const open = openSections[key]!==false;
-    const done = rows.filter(({r})=>r[MOUC.checked]==='TRUE').length;
+    const done = rows.filter(({r})=>isChecked(r[MOUC.checked])).length;
     html += `<div class="section-card">
       <div class="section-header" onclick="toggleSec('${key}')">
         <span class="section-label">${sec}</span>
@@ -477,7 +481,7 @@ function renderMOU() {
     if (open) {
       html += '<div style="padding:6px 18px 12px">';
       for (const {r,i} of rows) {
-        const checked = r[MOUC.checked]==='TRUE';
+        const checked = isChecked(r[MOUC.checked]);
         const note    = (r[MOUC.note]||'').replace(/"/g,'&quot;');
         const label   = r[MOUC.label]||'';
         html += `<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)">

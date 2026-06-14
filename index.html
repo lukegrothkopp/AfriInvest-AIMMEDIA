@@ -178,6 +178,16 @@ let openSections={}, saving=false, activeMonth='all';
 
 // ── API: READS via Sheets API (public read), WRITES via Apps Script ───────────
 async function sheetsRead(range) {
+  // Route reads through Apps Script to avoid Sheets API rate limits
+  if (SCRIPT_URL !== 'YOUR_APPS_SCRIPT_URL_HERE') {
+    try {
+      const data = await jsonp(`${SCRIPT_URL}?action=read&range=${encodeURIComponent(range)}`);
+      return data.values || [];
+    } catch(e) {
+      // fall through to direct API on failure
+    }
+  }
+  // Fallback: direct Sheets API (read-only, no writes)
   const r = await fetch(`${BASE}/values/${encodeURIComponent(range)}?key=${API_KEY}`);
   if (!r.ok) throw new Error(`Read error ${r.status}`);
   const d = await r.json();
@@ -217,8 +227,7 @@ async function scriptWrite(action, range, values) {
   return jsonp(`${SCRIPT_URL}?${params.toString()}`);
 }
 
-async function scriptClear(range)         { return scriptWrite('clear', range); }
-async function scriptWriteRange(range, v) { return scriptWrite('write', range, v); }
+
 
 // ── LOAD ─────────────────────────────────────────────────────────────────────
 async function loadAll() {
@@ -260,21 +269,21 @@ async function withSync(mutateFn, saveFn) {
 }
 
 async function saveM1() {
-  await scriptClear('m1_deliverables!A2:J300');
-  if (M1_DATA.length) await scriptWriteRange('m1_deliverables!A2', M1_DATA.map(r=>[...r]));
+  await scriptWrite('clear', 'm1_deliverables!A2:J300');
+  if (M1_DATA.length) await scriptWrite('write', 'm1_deliverables!A2', M1_DATA.map(r=>[...r]));
 }
 async function saveMOU() {
-  await scriptClear('mou_milestones!A2:E200');
-  if (MOU_DATA.length) await scriptWriteRange('mou_milestones!A2', MOU_DATA.map(r=>[...r]));
+  await scriptWrite('clear', 'mou_milestones!A2:E200');
+  if (MOU_DATA.length) await scriptWrite('write', 'mou_milestones!A2', MOU_DATA.map(r=>[...r]));
 }
 async function savePay() {
-  await scriptClear('payments!A2:E20');
-  if (PAY_DATA.length) await scriptWriteRange('payments!A2', PAY_DATA.map(r=>[...r]));
+  await scriptWrite('clear', 'payments!A2:E20');
+  if (PAY_DATA.length) await scriptWrite('write', 'payments!A2', PAY_DATA.map(r=>[...r]));
 }
 async function saveLog() {
   const rows = LOG_DATA.slice(0, 100);
-  await scriptClear('activity_log!A2:B300');
-  if (rows.length) await scriptWriteRange('activity_log!A2', rows);
+  await scriptWrite('clear', 'activity_log!A2:B300');
+  if (rows.length) await scriptWrite('write', 'activity_log!A2', rows);
 }
 function addLog(msg) {
   LOG_DATA.unshift([new Date().toLocaleString(), msg]);
